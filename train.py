@@ -8,8 +8,6 @@ import datasets as ds
 
 class JsonlGenerator:
     def __init__(self, cfg, tok, fname):
-        # Lazy loader pulls the entire thing into RAM
-        # Won't work if the dataset gets too large.
         with open(fname, 'r') as f:
             lines = f.readlines()
             self.text = lines
@@ -23,7 +21,7 @@ class JsonlGenerator:
             yield x
 
     def tokenize(self, x):
-        text = self.tokenizer(x['text'], truncation=True)
+        text = self.tokenizer(x['text'], truncation=False)
 
         return text
 
@@ -46,8 +44,6 @@ class JsonlGenerator:
 
         x['input_ids'] = new_text
         x['attention_mask'] = new_mask
-        # for k in x.keys():
-            # print(len(x[k]))
         return x
 
     def get_dsets(self):
@@ -62,6 +58,7 @@ class JsonlGenerator:
             batched=True
         ).shuffle()
 
+        print("Processed dataset len", len(dset))
         self.dset_split = dset.train_test_split(test_size=0.10)
         self.tokenized_train = self.dset_split['train']
         self.tokenized_val = self.dset_split['test']
@@ -151,7 +148,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "-c", "--config",
         type=str,
-        default="train_cfg.json",
+        default="train_ycr_410m.json",
         help="Path to a configuration file. Pass the same thing that was given to training.",
     )
     parser.add_argument(
