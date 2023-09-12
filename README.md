@@ -1,6 +1,14 @@
 # YouCompleteReLM
 Text completion model to generate DSP Corpus style messages with decoder style LMs
 
+# Quickstart with Google Colab
+You can easily generate text with this notebook without installing anything using [Google Colab](https://colab.research.google.com/github/oddlyshapedfn/YouCompleteReLM/blob/main/YCR.ipynb)!
+You must be signed in to execute code on Colab, but you can always view it.
+
+Although Colab notebooks can store data in your G Drive (after asking for permission), this notebook does not,
+so you will need to rerun all the setup if you leave and come back. During setup, the model weights are
+downloaded to the Colab instance storage, and are lost when you leave.
+
 # Installation
 ### If using Windows, please see the [Windows instructions](WINDOWS_SETUP.md)
 ```
