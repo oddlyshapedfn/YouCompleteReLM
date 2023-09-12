@@ -59,3 +59,10 @@ python infer.py -p "<YCR>:My detractors are"
 # Response (Truncated)
 <YCR>:My detractors are idiots, ive seen it myself. They literally just post up threads like this, derail the thread and then go on to make new ones of their own, completely changing the topic of the thread. Its sooo fucking annoying. Ive had to delete about a dozen posts in the last 24 hours because they were just too fucking annoying and derailing the thread. So if you hafta know, keep it on-topic and away from the personal attacks. Thanks.  Oh yeah, and by the way, theres a reason im not going to be at ECC: because im not going to waste my time with idiots
 ```
+### Stream Integration
+The `infer_with_chat.py` script uses `chat_downloader` to watch a stream chat for the program's trigger word, than it responds by using the most recent message as a prompt.
+Use like:
+```
+python infer_with_chat.py --channel @ChannelName --trigger "" -d cuda -n ModelName --cooldown 10 --repetition_penalty=1.15 --top_p=0.5 --top_k=50 -t 0.90 --blocksize=128
+```
+The same generation options are available as on most text generation tools.
