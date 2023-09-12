@@ -69,7 +69,7 @@ class JsonlGenerator:
 
         return self.tokenized_train, self.tokenized_val
 
-class ScorePredictorModel:
+class YouCompleteReModel:
     def __init__(self, cfg, tok):
         self.cfg = cfg
         self.tokenizer = tok
@@ -133,8 +133,8 @@ class ScorePredictorModel:
                 **inputs,
                 do_sample=True,
                 max_new_tokens=1024,
-                temperature=0.25,
-                top_k=60,
+                temperature=0.70,
+                top_k=50,
                 pad_token_id=tokenizer.eos_token_id,
             )
         output = self.tokenizer.batch_decode(output)[0]
@@ -177,8 +177,8 @@ if __name__ == '__main__':
     tokenizer.pad_token = tokenizer.eos_token
 
     t, v = JsonlGenerator(cfg, tokenizer, opt.dataset).get_dsets()
-    mdl = ScorePredictorModel(cfg, tokenizer)
+    mdl = YouCompleteReModel(cfg, tokenizer)
     mdl.train(t, v, opt.resume)
     mdl.save('ycr-chat')
     mdl.evaluate()
-    mdl.predict("You")
+    mdl.predict("<YCR>:")

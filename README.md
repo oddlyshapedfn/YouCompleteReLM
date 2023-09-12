@@ -1,16 +1,16 @@
 # YouCompleteReLM
-Generate DSP Corpus style messages with decoder style LMs
+Text completion model to generate DSP Corpus style messages with decoder style LMs
 
 # Installation
 ```
 pip install transformers datasets accelerate deepspeed
 ```
-If training, the default configuration assumes you have an RTX 30-series
-or newer. If not, you will need to tweak certain parameters in train.py,
-such toggling bf16 or tf32.
+If training your own weights, the default configuration assumes you have an RTX 30-series
+or newer. If you have a different GPU, you will need to tweak certain parameters in
+train.py, such as toggling bf16 or tf32.
 
 Training assumes you're using Linux. It may be possible to train in WSL, but
-`deepspeed` may need some manual patches, and WSL will probably need to be configured
+`deepspeed` will likely need some manual patches, and WSL will need to be configured
 to allow significantly more memory in its VM.
 
 # Training
@@ -45,10 +45,10 @@ python infer.py -p "<YCR>:My detractors are" -n oddlyshapedfn/YouCompleteRe
 This downloads the weights from Huggingface Hub to your computer. They are quite large, so if you
 want to delete them later, they'll be stored in `~/.cache/huggingface/hub` (On linux)
 
-### Prompting
-To generate from a prompt, either create a file with your prompt or pass it as plaintext
+### Text Completion
+To complete existing text, either create a file with your prompt or pass it as plaintext
 on the commandline with `python infer.py -p <file or text>`.
-This model responds best to the phrase `<YCR>: <your message>`, so start your prompt with
+This model responds best to the phrase `<YCR>: <your message>`, so start your text with
 that for best results.
 Example:
 ```

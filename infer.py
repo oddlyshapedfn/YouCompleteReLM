@@ -60,7 +60,7 @@ def infer(opt, cfg):
         temperature=opt.temperature,
         top_k=opt.top_k,
         top_p=opt.top_p,
-        repetition_penalty=1.05,
+        repetition_penalty=opt.repetition_penalty,
         length_penalty=1.0,
         num_return_sequences=1
     )
@@ -91,6 +91,12 @@ if __name__ == '__main__':
         type=float,
         help="Temperature to use for generation.",
         default=0.5
+    )
+    parser.add_argument(
+        "-r", "--repetition_penalty",
+        type=float,
+        help="Repetition penalty to use for generation.",
+        default=1.05
     )
     parser.add_argument(
         "--top_k",
