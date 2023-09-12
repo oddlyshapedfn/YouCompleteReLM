@@ -1,0 +1,14 @@
+{
+    "model_name": "EleutherAI/pythia-160m-deduped",
+    "blocksize": 512,
+    "batchsize": 8,
+    "gradient_accumulation_steps": 8,
+    "gradient_checkpointing": false,
+    "attention_dropout": 0.1,
+    "lr": "3e-5",
+    "scheduler": "cosine",
+    "epochs": 5,
+    "save_steps": 500,
+    "eval_steps": 15,
+    "device": "cuda"
+}
