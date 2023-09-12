@@ -13,6 +13,17 @@ DEBUG=False
 # not appear in the final output.
 MODEL_TRIGGER="<YCR>:"
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def cid_to_url(channelid) -> str:
     return 'https://www.youtube.com/{}'.format(channelid)
 
@@ -24,6 +35,8 @@ class StopAtTok(tfs.StoppingCriteria):
         return input_ids.flatten()[-1] == self.stoptok.flatten()
 
 def infer(opt):
+    if os.name == 'nt':
+        os.system('color')
     print("Loading model for inference.")
     tokenizer = tfs.AutoTokenizer.from_pretrained(
         opt.modelname,
@@ -70,7 +83,7 @@ def infer(opt):
         exit(-1)
 
     output = []
-    last_response = time.time()
+    last_response = 0
     with torch.no_grad():
         for m in chat:
             on_cooldown = (time.time() - last_response) < opt.cooldown
@@ -86,7 +99,7 @@ def infer(opt):
                         .format(m['message'])
                     )
                 last_response = time.time()
-                stripped = m['message'].strip(opt.trigger)
+                stripped = m['message'].lstrip(opt.trigger)
                 prompt = MODEL_TRIGGER + stripped
 
                 inputs = tokenizer(prompt, return_tensors='pt', truncation=False).to(opt.device)
@@ -97,10 +110,19 @@ def infer(opt):
                     generation_config=generation_cfg,
                     stopping_criteria=[stopper]
                 )
-                output = tokenizer.batch_decode(logits)[0]
+
+                raw_output = tokenizer.batch_decode(logits)[0]
+                generated_only = raw_output[len(prompt):]
+                prompt_no_trg = prompt.lstrip(MODEL_TRIGGER)
+
+                prefix = "Snortana🐽💨 (Responding to {}):".format(m['author']['name'])
+
+                output = bcolors.BOLD + prefix + bcolors.ENDC +\
+                    bcolors.WARNING + " " + prompt_no_trg + bcolors.ENDC + \
+                    bcolors.OKGREEN + generated_only + bcolors.ENDC
 
                 os.system('cls' if os.name == 'nt' else 'clear')
-                print(output.replace(MODEL_TRIGGER, "\033[1mSnortana🐽💨\033[0m: "))
+                print(output)
 
             else:
                 if DEBUG:
@@ -109,10 +131,6 @@ def infer(opt):
                         .format(m['message'])
                     )
                 continue
-
-
-    print("\n".join(output))
-    return output
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -180,8 +198,4 @@ if __name__ == '__main__':
              "If a message with the trigger arrives during cooldown, it is dropped."
     )
     opt = parser.parse_args()
-    output = infer(opt)
-    for ix, v in enumerate(output):
-        fname = "out.txt"
-        with open(fname, 'w') as f:
-            f.write(v)
+    infer(opt)
