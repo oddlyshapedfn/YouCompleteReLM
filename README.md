@@ -37,6 +37,14 @@ your system must also have sufficient DRAM.
 Inference can run on just about any machine, even if a GPU is not available.
 Once you have a trained model in `ycr-chat`, you can just run `python infer.py`
 See `python infer.py --help` for sampling options too.
+### Pretrained
+If you do not wish to train the model yourself, you can use my pretrained weights like this:
+```
+python infer.py -p "<YCR>:My detractors are" -n oddlyshapedfn/YouCompleteRe
+```
+This downloads the weights from Huggingface Hub to your computer. They are quite large, so if you
+want to delete them later, they'll be stored in `~/.cache/huggingface/hub` (On linux)
+
 ### Prompting
 To generate from a prompt, either create a file with your prompt or pass it as plaintext
 on the commandline with `python infer.py -p <file or text>`.

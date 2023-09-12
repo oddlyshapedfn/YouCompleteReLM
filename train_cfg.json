@@ -1,5 +1,5 @@
 {
-    "model_name": "EleutherAI/pythia-160m-deduped",
+    "model_name": "EleutherAI/pythia-410m-deduped",
     "blocksize": 512,
     "batchsize": 8,
     "gradient_accumulation_steps": 8,
