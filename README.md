@@ -2,6 +2,7 @@
 Text completion model to generate DSP Corpus style messages with decoder style LMs
 
 # Installation
+### If using Windows, please see the [Windows instructions](WINDOWS_SETUP.md)
 ```
 pip install transformers datasets accelerate deepspeed
 ```
@@ -23,7 +24,7 @@ if your paths deviate from its default configuration.
 Inside of `train_cfg.json`, you can select various parameters for training. For instance,
 you can use a different base model if your machine has a lower VRAM/DRAM capacity.
 Decreasing blocksize, batchsize, or switching to a smaller model reduces RAM usage.
-Setting `gradient_checkpoint` to `true` also significantly reduces RAM usage but slows down training.
+Setting `gradient_checkpointing` to `true` also significantly reduces VRAM usage but slows down training.
 See below about `gradient_accumulation_steps`.
 For reasonable responses, I recommend using `EleutherAI/pythia-410m-deduped` or larger.
 

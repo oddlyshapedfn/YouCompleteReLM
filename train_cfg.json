@@ -4,11 +4,11 @@
     "batchsize": 8,
     "gradient_accumulation_steps": 8,
     "gradient_checkpointing": false,
-    "attention_dropout": 0.1,
+    "attention_dropout": 0.2,
     "lr": "3e-5",
     "scheduler": "cosine",
     "epochs": 5,
     "save_steps": 500,
-    "eval_steps": 15,
-    "device": "cpu"
+    "eval_steps": 25,
+    "device": "cuda"
 }
