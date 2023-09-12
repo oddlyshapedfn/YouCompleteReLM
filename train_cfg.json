@@ -10,5 +10,5 @@
     "epochs": 5,
     "save_steps": 500,
     "eval_steps": 15,
-    "device": "cuda"
+    "device": "cpu"
 }

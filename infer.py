@@ -1,8 +1,4 @@
-import json
-import sys
-import re
 import argparse
-import os
 
 import transformers as tfs
 import torch
@@ -14,40 +10,31 @@ class StopAtTok(tfs.StoppingCriteria):
     def __call__(self, input_ids: torch.LongTensor, score: torch.FloatTensor, **kwargs) -> bool:
         return input_ids.flatten()[-1] == self.stoptok.flatten()
 
-def infer(opt, cfg):
+def infer(opt):
     print("Loading model for inference.")
     tokenizer = tfs.AutoTokenizer.from_pretrained(
         opt.modelname,
     )
     tokenizer.pad_token = tokenizer.eos_token
 
-    # Need to manually enable use_cache. It must be disabled for training if
-    # gradient_checkpointing is enabled, but if it's disabled, it slows generation
     config = tfs.AutoConfig.from_pretrained(opt.modelname)
     config.use_cache=True
 
     model = tfs.AutoModelForCausalLM.from_pretrained(
         opt.modelname,
         config=config
-    ).to(cfg['device'])
+    ).to(opt.device)
     model.eval()
 
-    prompt=""
-    if os.path.exists(opt.prompt):
-        print("Loading prompt from a file")
-        with open(opt.prompt, 'r') as f:
-            prompt = f.read().rstrip()
-    else:
-        print("Prompt does not look like a file, treating it as a string.")
-        prompt = opt.prompt
+    prompt = opt.prompt
 
-    inputs = tokenizer(prompt, return_tensors='pt', truncation=True).to(cfg['device'])
-    inputs = inputs.to(cfg['device'])
+    inputs = tokenizer(prompt, return_tensors='pt', truncation=True).to(opt.device)
+    inputs = inputs.to(opt.device)
     prompt_len_tok = inputs['input_ids'].shape[-1]
 
     print("Prompt has size {}, leaving {} tokens for generation".format(
         prompt_len_tok,
-        cfg['blocksize'] - prompt_len_tok
+        opt.blocksize - prompt_len_tok
     ))
 
     generation_cfg = tfs.GenerationConfig(
@@ -56,7 +43,7 @@ def infer(opt, cfg):
         bos_token_id=model.config.bos_token_id,
         pad_token_id=model.config.eos_token_id,
         use_cache=True,
-        max_new_tokens=(cfg['blocksize'] - prompt_len_tok),
+        max_new_tokens=(opt.blocksize - prompt_len_tok),
         temperature=opt.temperature,
         top_k=opt.top_k,
         top_p=opt.top_p,
@@ -65,8 +52,7 @@ def infer(opt, cfg):
         num_return_sequences=1
     )
 
-    # Stop generation when a newline is hit
-    stopper = StopAtTok(tokenizer("\n", return_tensors='pt').to(cfg["device"]))
+    stopper = StopAtTok(tokenizer("\n", return_tensors='pt').to(opt.device))
 
     print("Loaded model.")
     output = []
@@ -105,16 +91,22 @@ if __name__ == '__main__':
         default=50,
     )
     parser.add_argument(
+        "-b", "--blocksize",
+        type=int,
+        help="Generate up to this many tokens.",
+        default=256,
+    )
+    parser.add_argument(
         "--top_p",
         type=float,
         help="Value to use for topp sampling during generation.",
         default=1.0,
     )
     parser.add_argument(
-        "-c", "--config",
+        "-d", "--device",
         type=str,
-        help="Path to a configuration file. Pass the same thing that was given to training.",
-        default="train_cfg.json"
+        help="Device to use for inference. Choose cpu or cuda.",
+        default="cpu"
     )
     parser.add_argument(
         '-n', '--modelname',
@@ -126,15 +118,10 @@ if __name__ == '__main__':
         "-p", "--prompt",
         type=str,
         default="<YCR>:",
-        help="Prompt. Either a raw string, or the filename"
+        help="Prompt as plaintext. For best results, start with \"<YCR>:\""
     )
     opt = parser.parse_args()
-
-    with open(opt.config, 'r') as f:
-        cfg = json.load(f)
-        print("Using config", cfg)
-
-    output = infer(opt, cfg)
+    output = infer(opt)
     for ix, v in enumerate(output):
         fname = "out.txt"
         with open(fname, 'w') as f:
